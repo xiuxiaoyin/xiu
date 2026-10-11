@@ -24,6 +24,8 @@ def create_todo():
 
     #校验
     request_body = request.get_json()       #得到请求体(json格式)
+    if not isinstance(request_body, dict):
+        return jsonify({"message": "请求体必须是 JSON 对象"}), 400      #防止请求体不是json对象，导致后面类型不匹配
     if "title" not in request_body:
          return jsonify({"message": "title字段不在字典里"}), 400
     if request_body["title"] is None:
@@ -44,20 +46,33 @@ def create_todo():
     return jsonify(todo),201
 
 #GET/todos/<id>
-@app.route("/todos/<int:todo_id>", methods=["GET"])
-def get_todo(todo_id):
+@app.route("/todos/<todo_id>", methods=["GET"])
+def get_todo(todo_id):      #这里拿到todo_id的是字符串，因为路径里没有int转型了
+    
+    try:
+        todo_id = int(todo_id)      #自己转型，防止id不是数字和-1的情况走flask路由
+    except ValueError:
+        return jsonify({"message": "id 必须是数字"}), 400
+    
     todo = find_todo(todo_id)       #找
     if todo is None:
-        return jsonify({"message": "todo not found"}), 404      #id不存在
+        return jsonify({"message": "todo not found"}), 404      #id不存在，id为0，id超大数字，id为-1
     return jsonify(todo)
    
 
 #PUT/todos/<id>
-@app.route("/todos/<int:todo_id>", methods=["PUT"])
-def update_todo(todo_id):
-
+@app.route("/todos/<todo_id>", methods=["PUT"])
+def update_todo(todo_id):       #这里拿到todo_id的是字符串，因为路径里没有int转型了
+    
+    try:
+        todo_id = int(todo_id)      #自己转型，防止id不是数字和-1的情况走flask路由
+    except ValueError:
+        return jsonify({"message": "id 必须是数字"}), 400
+    
     #校验
     request_body = request.get_json()       #得到请求体(json格式)
+    if not isinstance(request_body, dict):
+        return jsonify({"message": "请求体必须是 JSON 对象"}), 400      #防止请求体不是json对象，导致后面类型不匹配
     if "title" not in request_body:
          return jsonify({"message": "title不在字典里"}), 400
     if request_body["title"] is None:
@@ -74,17 +89,23 @@ def update_todo(todo_id):
     #业务逻辑
     todo = find_todo(todo_id)       #找
     if todo is None:
-        return jsonify({"message": "todo not found"}), 404      #id不存在
+        return jsonify({"message": "todo not found"}), 404      #id不存在，id为0，id超大数字，id为-1
     todo["title"] = request_body["title"]
     todo["completed"] = request_body["completed"]
     return jsonify(todo),200
 
 #DELETE/todos/<id>
-@app.route("/todos/<int:todo_id>", methods=["DELETE"])
-def delete_todo(todo_id):
+@app.route("/todos/<todo_id>", methods=["DELETE"])
+def delete_todo(todo_id):       #这里拿到todo_id的是字符串，因为路径里没有int转型了
+    
+    try:
+        todo_id = int(todo_id)      #自己转型，防止id不是数字和-1的情况走flask路由
+    except ValueError:
+        return jsonify({"message": "id 必须是数字"}), 400
+    
     todo = find_todo(todo_id)       #找
     if todo is None:
-        return jsonify({"message": "todo not found"}), 404      #id不存在
+        return jsonify({"message": "todo not found"}), 404      #id不存在，id为0，id超大数字，id为-1
     todos.remove(todo)
     return "",204
     
