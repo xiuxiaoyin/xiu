@@ -28,6 +28,7 @@ def get_todo(todo_id):
     for todo in todos:      #遍历列表
         if todo["id"] == todo_id:       #如果元素（这里是字典）中“id”值与参数todo_id一致
             return jsonify(todo)
+    return jsonify({"message": "todo not found"}), 404      #id不存在
 
 #PUT/todos/<id>
 @app.route("/todos/<int:todo_id>", methods=["PUT"])
@@ -38,6 +39,8 @@ def update_todo(todo_id):
             todo["title"] = request_body["title"]
             todo["completed"] = request_body["completed"]
             return jsonify(todo),200
+    return jsonify({"message": "todo not found"}), 404      #id不存在
+
 
 #DELETE/todos/<id>
 @app.route("/todos/<int:todo_id>", methods=["DELETE"])
@@ -46,6 +49,8 @@ def delete_todo(todo_id):
             if todo["id"] == todo_id:       #如果元素（这里是字典）中“id”值与参数todo_id一致
                 todos.remove(todo)
                 return "",204
+    return jsonify({"message": "todo not found"}), 404      #id不存在
+
 
 if __name__ == "__main__":       # 如果是直接运行这个文件，就启动服务；如果被 import，则不启动
     app.run(debug=True)
