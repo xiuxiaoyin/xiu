@@ -1,0 +1,23 @@
+- case_name: "title字段不在字典里"
+  body: {}
+  expected_message: "title字段不在字典里"
+- case_name: "title为null"
+  body:
+    title: null
+  expected_message: "title为null"
+- case_name: "title不是字符串"
+  body:
+    title: 123
+  expected_message: "title不是字符串"
+- case_name: "title为空串"
+  body:
+    title: ""
+  expected_message: "title为空串"
+- case_name: "title超出长度限制"
+  body:
+    title: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  expected_message: "title超出长度限制"
+- case_name: "title为纯空格"
+  body:
+    title: "   "
+  expected_message: "title为空串"
