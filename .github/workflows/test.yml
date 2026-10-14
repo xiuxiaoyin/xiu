@@ -1,0 +1,25 @@
+#触发条件
+on:
+  push:
+    branches: [main] # push 到 main 时触发
+  workflow_dispatch: # 允许在网页上手动点按钮跑
+
+#任务本体
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+      - name: 安装Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+      - name: 启动被测服务
+        run: |
+          python app.py &
+          sleep 3
+      - name: 跑测试
+        run: pytest -q
