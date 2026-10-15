@@ -21,5 +21,11 @@ jobs:
         run: |
           python app.py &
           sleep 3
-      - name: 跑测试
-        run: pytest -q
+      - name: 运行测试
+        run: pytest -q --alluredir=./allure-results --clean-alluredir
+      - name: 上传测试报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results/
