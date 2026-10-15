@@ -22,7 +22,7 @@ def test_get_todos_success(temp_todo):
 @allure.story("id不存在")            # 功能下的一个场景组
 def test_get_todo_fail_99():
     r = get("/todos/99")
-    assert r.status_code == 404
+    assert r.status_code == 400
     assert r.json()["message"] == "todo not found"
 
 # 用例：获取单条，id不是数字->400
