@@ -1,8 +1,16 @@
+name: test
+
 #触发条件
 on:
   push:
     branches: [main] # push 到 main 时触发
   workflow_dispatch: # 允许在网页上手动点按钮跑
+
+#权限声明
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 #任务本体
 jobs:
@@ -11,21 +19,49 @@ jobs:
     steps:
       - name: 拉取代码
         uses: actions/checkout@v4
+
       - name: 安装Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
+
       - name: 安装依赖
         run: pip install -r requirements.txt
+
       - name: 启动被测服务
         run: |
           python app.py &
           sleep 3
+
       - name: 运行测试
         run: pytest -q --alluredir=./allure-results --clean-alluredir
-      - name: 上传测试报告
+
+      - name: 安装 Allure CLI
         if: always()
-        uses: actions/upload-artifact@v4
+        run: |
+          curl -sL -o /tmp/allure.tgz https://github.com/allure-framework/allure2/releases/download/2.29.0/allure-2.29.0.tgz
+          sudo tar -xzf /tmp/allure.tgz -C /opt
+          sudo ln -sf /opt/allure-2.29.0/bin/allure /usr/local/bin/allure
+          allure --version
+
+      - name: 生成 HTML 报告
+        if: always()
+        run: allure generate ./allure-results -o ./allure-report --clean
+
+      - name: 上传 Pages 产物
+        if: always()
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: allure-results
-          path: allure-results/
+          path: ./allure-report
+
+  deploy:
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
