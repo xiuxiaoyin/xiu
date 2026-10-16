@@ -5,6 +5,7 @@ import pytest
 import allure
 from common.config import BASE_URL, CASES
 from common.http_client import post
+from conftest import clear_all_todos
 
 #post参数化
 @allure.epic("待办事项 API")        # 最顶层：整个项目
@@ -25,4 +26,5 @@ def test_create_todo_success():
     assert r.status_code == 201
     assert isinstance(r.json()["id"], int)      # 是个整数就行，不关心具体是几
     assert r.json()["title"] == "买菜"
-    assert r.json()["completed"] is False   
+    assert r.json()["completed"] is False 
+    clear_all_todos()       #清空所以待办

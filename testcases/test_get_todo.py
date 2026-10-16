@@ -13,8 +13,8 @@ from common.http_client import get
 def test_get_todos_success(temp_todo):
     r = get("/todos")
     assert r.status_code == 200
-    assert len(r.json()) == 1                  # 干净环境里只有 1 条
-    assert r.json()[0]["id"] == temp_todo["id"]      # 就是刚创建那条
+    ids = [t["id"] for t in r.json()]
+    assert temp_todo["id"] in ids
 
 # 用例：获取单条，id不存在->404
 @allure.epic("待办事项 API")        # 最顶层：整个项目

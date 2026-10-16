@@ -51,8 +51,10 @@ pytest --alluredir=./allure-results --clean-alluredir
 allure serve ./allure-results
 ```
 
-## 测试报告截图
+## 测试报告
 
+在线查看最新报告：https://xiuxiaoyin.github.io/xiu/
+每次push自动更新
 ![测试报告截图](./docs/allure-report.png)
 
 ## 设计要点
