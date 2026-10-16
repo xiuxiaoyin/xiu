@@ -17,6 +17,7 @@ packaging==26.3
 pluggy==1.6.0
 Pygments==2.21.0
 pytest==9.1.1
+pytest-rerunfailures==16.7
 pytest-xdist==3.8.0
 PyYAML==6.0.3
 pyyml==0.0.2

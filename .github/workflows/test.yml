@@ -31,7 +31,15 @@ jobs:
       - name: 启动被测服务
         run: |
           python app.py &
-          sleep 3
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:5000/todos > /dev/null; then
+              echo "服务已就绪（等了 ${i} 秒）"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "服务在 30 秒内未就绪"
+          exit 1
 
       - name: 运行测试
         run: pytest -q --alluredir=./allure-results --clean-alluredir
