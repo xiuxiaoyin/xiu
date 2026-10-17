@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)       #创建一个 Flask 应用实例
@@ -12,6 +14,11 @@ def find_todo(todo_id):
         if todo["id"] == todo_id:       #如果元素（这里是字典）中“id”值与参数todo_id一致
             return todo
     return None         #todos列表中全没匹配上
+
+#前端界面
+@app.route("/")
+def index():
+    return app.send_static_file("index.html")
 
 #GET/todos
 @app.route("/todos", methods=["GET"])
@@ -111,4 +118,4 @@ def delete_todo(todo_id):       #这里拿到todo_id的是字符串，因为路�
     
 
 if __name__ == "__main__":       # 如果是直接运行这个文件，就启动服务；如果被 import，则不启动
-    app.run(debug=True)
+    app.run(debug=not os.environ.get("CI"))     #在 CI 中关闭 debug

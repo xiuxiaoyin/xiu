@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>待办列表</title>
+  </head>
+  <body>
+    <input data-testid="new-todo-input" placeholder="要做什么？" />
+    <button data-testid="add-button">添加</button>
+    <ul data-testid="todo-list"></ul>
+
+    <script>
+      // ① 找元素（注意用 querySelector，不是 getElementById）
+      const input = document.querySelector('[data-testid="new-todo-input"]');
+      const addButton = document.querySelector('[data-testid="add-button"]');
+      const list = document.querySelector('[data-testid="todo-list"]');
+
+      // ② 拉取列表并渲染
+      async function loadTodos() {
+        const resp = await fetch("/todos");
+        const todos = await resp.json();
+
+        list.innerHTML = ""; // 先清空，再重建
+
+        for (const todo of todos) {
+          const li = document.createElement("li");
+          li.setAttribute("data-testid", "todo-item");
+
+          // 勾选框
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = todo.completed;
+          checkbox.setAttribute("data-testid", "todo-checkbox");
+          checkbox.addEventListener("change", async () => {
+            await fetch(`/todos/${todo.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                title: todo.title,
+                completed: !todo.completed,
+              }),
+            });
+            await loadTodos();
+          });
+
+          // 标题
+          const span = document.createElement("span");
+          span.setAttribute("data-testid", "todo-title");
+          span.textContent = todo.title; // ← textContent，不是 innerHTML
+
+          // 删除按钮
+          const del = document.createElement("button");
+          del.textContent = "删除";
+          del.setAttribute("data-testid", "delete-button");
+          del.addEventListener("click", async () => {
+            // TODO: 调用 DELETE /todos/{todo.id}，然后 await loadTodos()
+            await fetch(`/todos/${todo.id}`, {
+              method: "DELETE",
+            });
+            await loadTodos();
+          });
+
+          li.appendChild(checkbox);
+          li.appendChild(span);
+          li.appendChild(del);
+          list.appendChild(li);
+        }
+      }
+
+      // ③ 点"添加"
+      addButton.addEventListener("click", async () => {
+        const title = input.value.trim();
+        if (!title) return; // 空的不发
+
+        await fetch("/todos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title }),
+        });
+
+        input.value = ""; // 清空输入框
+        await loadTodos();
+      });
+
+      // ④ 页面打开先加载一次
+      loadTodos();
+    </script>
+  </body>
+</html>
